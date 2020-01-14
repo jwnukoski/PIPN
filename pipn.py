@@ -1,6 +1,9 @@
 import smtplib, ssl, time
 from json import load
-from urllib.request import urlopen
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
 
 def getPublicIp():
     # Uses ipify
@@ -11,6 +14,7 @@ def getPublicIp():
         return "0.0.0.0"
 
 def sendEmail(_smtpServer, _smtpPort, _senderEmail, _password, _receiverEmail, _msg):
+    print("Trying to send email notification about IP being: " + _msg)
     try:
         context = ssl.create_default_context()
         with smtplib.SMTP(_smtpServer, _smtpPort) as server:
@@ -21,18 +25,18 @@ def sendEmail(_smtpServer, _smtpPort, _senderEmail, _password, _receiverEmail, _
             server.sendmail(_senderEmail, _receiverEmail, _msg)
         print("Email sent for updated IP: " + _msg)
     except Exception as e:
-        print("Error sending email. " + str(e))
+        print("Error sending email: " + str(e))
 
 # Change your settings here if you dont want to use google SMTP, or
 # dont want to input your settings each time. DONT save your password in here.
 smtpPort = int(input("Enter the SMTP port (Google: 587): "))  # For starttls
-smtpServer = input("Enter the SMTP server (Google: smtp.gmail.com): ")
-senderEmail = input("Sender email address: ")
+smtpServer = raw_input("Enter the SMTP server (Google: smtp.gmail.com): ")
+senderEmail = raw_input("Sender email address: ")
 if (senderEmail.__contains__("@gmail.com")):
     # Tip for gmail users.
     print("\nLooks like you are using Gmail. Make sure Less secure app access is on.\nRead more here: https://myaccount.google.com/lesssecureapps\n")
-receiverEmail = input("Receiver email address: ")
-password = input("Type your password and press enter: ")
+receiverEmail = raw_input("Receiver email address: ")
+password = raw_input("Type your password and press enter: ")
 
 # Time in seconds you want to grab your public IP
 checkInterval = int(input("Enter the public IP query interval in minutes: ")) * 60
